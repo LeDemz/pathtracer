@@ -1,2 +1,2 @@
 # pathtracer
-Path Tracing Projct
+Path Tracing Project
