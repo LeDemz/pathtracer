@@ -1,11 +1,13 @@
+pub mod vec3;
+
 use indicatif::{ProgressBar, ProgressStyle};
 use std::fs::File;
-use std::io::{Write};
+use std::io::Write;
+
 fn main() {
     // Image
     let image_width: u32 = 256;
     let image_height: u32 = 256;
-
     let mut file = File::create("image.ppm").expect("Unable to create file");
 
     // Indicatif setup
