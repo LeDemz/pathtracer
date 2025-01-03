@@ -1,6 +1,6 @@
 use indicatif::{ProgressBar, ProgressStyle};
 use std::fs::File;
-use std::io::{self, Write};
+use std::io::{Write};
 fn main() {
     // Image
     let image_width: u32 = 256;
