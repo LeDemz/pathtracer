@@ -264,8 +264,7 @@ mod tests {
     }
 
     #[test]
-    fn test_div()
-    {
+    fn test_div() {
         todo!()
     }
 }
