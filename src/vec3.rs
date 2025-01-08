@@ -1,4 +1,4 @@
-use std::ops::{Index, IndexMut, Neg, AddAssign, MulAssign, DivAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub};
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 struct Vec3 {
@@ -84,6 +84,79 @@ impl DivAssign<f64> for Vec3 {
     }
 }
 
+impl Add for Vec3 {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        Self::new(
+            self.e[0] + other.e[0],
+            self.e[1] + other.e[1],
+            self.e[2] + other.e[2],
+        )
+    }
+}
+
+impl Sub for Vec3 {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self {
+        Self::new(
+            self.e[0] - other.e[0],
+            self.e[1] - other.e[1],
+            self.e[2] - other.e[2],
+        )
+    }
+}
+
+impl Mul for Vec3 {
+    type Output = Self;
+
+    fn mul(self, other: Self) -> Self {
+        Self::new(
+            self.e[0] * other.e[0],
+            self.e[1] * other.e[1],
+            self.e[2] * other.e[2],
+        )
+    }
+}
+
+// Scalar multiplication (t * v)
+impl Mul<f64> for Vec3 {
+    type Output = Self;
+
+    fn mul(self, t: f64) -> Self {
+        Self::new(self.e[0] * t, self.e[1] * t, self.e[2] * t)
+    }
+}
+
+// Scalar division
+impl Div<f64> for Vec3 {
+    type Output = Self;
+
+    fn div(self, t: f64) -> Self {
+        self * (1.0 / t)
+    }
+}
+
+// Dot product
+pub fn dot(u: Vec3, v: Vec3) -> f64 {
+    u.e[0] * v.e[0] + u.e[1] * v.e[1] + u.e[2] * v.e[2]
+}
+
+// Cross product
+pub fn cross(u: Vec3, v: Vec3) -> Vec3 {
+    Vec3::new(
+        u.e[1] * v.e[2] - u.e[2] * v.e[1],
+        u.e[2] * v.e[0] - u.e[0] * v.e[2],
+        u.e[0] * v.e[1] - u.e[1] * v.e[0],
+    )
+}
+
+// Unit vector
+pub fn unit_vector(v: Vec3) -> Vec3 {
+    v / v.length()
+}
+
 // Unit tests for Vec3
 #[cfg(test)]
 mod tests {
@@ -160,5 +233,39 @@ mod tests {
     fn test_length_squared() {
         let v = Vec3::new(3.0, 4.0, 0.0);
         assert_eq!(v.length_squared(), 25.0);
+    }
+
+    #[test]
+    fn test_add() {
+        let v1 = Vec3::new(3.0, 4.0, 0.0);
+        let v2 = Vec3::new(1.0, 1.0, 1.0);
+        assert_eq!(v1 + v2, Vec3::new(4.0, 5.0, 1.0));
+    }
+
+    #[test]
+    fn test_sub() {
+        let v1 = Vec3::new(3.0, 4.0, 0.0);
+        let v2 = Vec3::new(1.0, 1.0, 1.0);
+        assert_eq!(v1 - v2, Vec3::new(2.0, 3.0, -1.0));
+    }
+
+    #[test]
+    fn test_mul() {
+        let v1 = Vec3::new(3.0, 4.0, 0.0);
+        let v2 = Vec3::new(1.0, 1.0, 1.0);
+        assert_eq!(v1 * v2, Vec3::new(3.0, 4.0, 0.0));
+    }
+
+    #[test]
+    fn test_mul_scalar() {
+        let v1 = Vec3::new(3.0, 4.0, 0.0);
+        let x: f64 = 5.0;
+        assert_eq!(v1 * x, Vec3::new(15.0, 20.0, 0.0));
+    }
+
+    #[test]
+    fn test_div()
+    {
+        todo!()
     }
 }
