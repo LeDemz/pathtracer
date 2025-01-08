@@ -1,12 +1,24 @@
+use indicatif::{ProgressBar, ProgressStyle};
 use pathtracer::Color;
 use pathtracer::Point3;
 use pathtracer::Ray;
 use pathtracer::Vec3;
-use indicatif::{ProgressBar, ProgressStyle};
 use std::fs::File;
 use std::io::Write;
 
+fn hit_sphere(center: &Point3, radius: f64, r: &Ray) -> bool {
+    let oc = *center - (r.origin());
+    let a = pathtracer::dot(r.direction(), r.direction());
+    let b = -2.0 * pathtracer::dot(r.direction(), oc);
+    let c = pathtracer::dot(oc, oc) - radius * radius;
+    let discriminant = b * b - 4.0 * a * c;
+    return discriminant >= 0.0;
+}
+
 fn ray_color(r: &Ray) -> Color {
+    if (hit_sphere(&Point3::new(0.0, 0.0, -1.0), 0.5, r)) {
+        return Color::new(1.0, 0.0, 0.0);
+    }
     let unit_direction = pathtracer::unit_vector(r.direction());
     let a = 0.5 * (unit_direction.y() + 1.0);
     (1.0 - a) * Color::new(1.0, 1.0, 1.0) + a * Color::new(0.5, 0.7, 1.0)

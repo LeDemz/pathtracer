@@ -273,9 +273,4 @@ mod tests {
         let x: f64 = 5.0;
         assert_eq!(v1 * x, Vec3::new(15.0, 20.0, 0.0));
     }
-
-    #[test]
-    fn test_div() {
-        todo!()
-    }
 }
