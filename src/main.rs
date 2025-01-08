@@ -1,4 +1,4 @@
-pub mod vec3;
+use pathtracer::Color;
 
 use indicatif::{ProgressBar, ProgressStyle};
 use std::fs::File;
@@ -36,11 +36,8 @@ fn main() {
             let g: f64 = (j as f64) / (image_height as f64 - 1.0);
             let b: f64 = 0.0;
 
-            let ir: i32 = (255.999 * r).floor() as i32;
-            let ig: i32 = (255.999 * g).floor() as i32;
-            let ib: i32 = (255.999 * b).floor() as i32;
-
-            writeln!(file, "{} {} {}", ir, ig, ib).expect("Unable to write content to file");
+            let pixel_color = Color::new(r, g, b);
+            pathtracer::write_color(&file, &pixel_color);
         }
     }
     pb.finish_with_message("Done");
