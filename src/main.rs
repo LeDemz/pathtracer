@@ -1,30 +1,25 @@
 use indicatif::{ProgressBar, ProgressStyle};
 use pathtracer::Color;
+use pathtracer::HitRecord;
+use pathtracer::Hittable;
 use pathtracer::Point3;
 use pathtracer::Ray;
+use pathtracer::Sphere;
 use pathtracer::Vec3;
+use pathtracer::INFINITY;
 use std::fs::File;
 use std::io::Write;
+use std::rc::Rc;
 
-fn hit_sphere(center: &Point3, radius: f64, r: &Ray) -> f64 {
-    let oc = *center - (r.origin());
-    let a = r.direction().length_squared();
-    let h = pathtracer::dot(r.direction(), oc);
-    let c = oc.length_squared() - radius * radius;
-    let discriminant = h * h - a * c;
-
-    if (discriminant < 0.0) {
-        return -1.0;
-    } else {
-        return (h- discriminant.sqrt()) / (a);
-    }
-}
-
-fn ray_color(r: &Ray) -> Color {
-    let t = hit_sphere(&Point3::new(0.0, 0.0, -1.0), 0.5, r);
-    if t > 0.0 {
-        let N = pathtracer::unit_vector(r.at(t) - Vec3::new(0.0, 0.0, -1.0));
-        return 0.5 * Color::new(N.x() + 1.0, N.y() + 1.0, N.z() + 1.0);
+fn ray_color<T: Hittable>(r: &Ray, world: &T) -> Color {
+    let mut rec: HitRecord = HitRecord {
+        p: Point3::new(0.0, 0.0, 0.0),
+        normal: Vec3::new(0.0, 0.0, 0.0),
+        t: 0.0,
+        front_face: false,
+    };
+    if world.hit(r, 0.0, INFINITY, &mut rec) {
+        return 0.5 * (rec.normal + Color::new(1.0, 1.0, 1.0));
     }
 
     let unit_direction = pathtracer::unit_vector(r.direction());
@@ -39,6 +34,14 @@ fn main() {
     let mut image_height: u32 = ((image_width as f64) / aspect_ratio).floor() as u32;
     image_height = if image_height < 1 { 1 } else { image_height };
 
+    // World
+    let mut world = pathtracer::HittableList::new();
+    let sphere1 = Rc::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5));
+    let sphere2 = Rc::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0));
+    world.add(sphere1);
+    world.add(sphere2);
+
+    // Camera
     let focal_length: f64 = 1.0;
     let viewport_height: f64 = 2.0;
     let viewport_width: f64 = viewport_height * (image_width as f64) / (image_height as f64);
@@ -86,7 +89,7 @@ fn main() {
             let ray_direction = pixel_center - camera_center;
             let r = Ray::new(camera_center, ray_direction);
 
-            let pixel_color = ray_color(&r);
+            let pixel_color = ray_color(&r, &world);
             pathtracer::write_color(&file, &pixel_color);
         }
     }
