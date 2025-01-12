@@ -2,6 +2,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 use pathtracer::Color;
 use pathtracer::HitRecord;
 use pathtracer::Hittable;
+use pathtracer::Interval;
 use pathtracer::Point3;
 use pathtracer::Ray;
 use pathtracer::Sphere;
@@ -18,7 +19,7 @@ fn ray_color<T: Hittable>(r: &Ray, world: &T) -> Color {
         t: 0.0,
         front_face: false,
     };
-    if world.hit(r, 0.0, INFINITY, &mut rec) {
+    if world.hit_interval(r, Interval::new(0.0, INFINITY), &mut rec) {
         return 0.5 * (rec.normal + Color::new(1.0, 1.0, 1.0));
     }
 

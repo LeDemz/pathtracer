@@ -1,4 +1,4 @@
-use crate::{dot, Point3, Ray, Vec3};
+use crate::{dot, interval::Interval, Point3, Ray, Vec3};
 use std::rc::Rc;
 
 #[derive(Clone, Copy)]
@@ -12,7 +12,7 @@ pub struct HitRecord {
 impl HitRecord {
     pub fn set_face_normal(&mut self, r: &Ray, outward_normal: &Vec3) {
         // Set the hit record normal vector
-        // NOTE: the parameter outward_normal is assumed to have unit length
+        // NOTE: the parameter outward_normal is assu med to have unit length
         self.front_face = dot(r.direction(), *outward_normal) < 0.0;
         self.normal = if self.front_face {
             *outward_normal
@@ -23,7 +23,8 @@ impl HitRecord {
 }
 
 pub trait Hittable {
-    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64, rec: &mut HitRecord) -> bool;
+    fn hit_tmin_tmax(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64, rec: &mut HitRecord) -> bool;
+    fn hit_interval(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool;
 }
 
 pub struct HittableList {
@@ -47,9 +48,9 @@ impl HittableList {
 }
 
 impl Hittable for HittableList {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
+    fn hit_tmin_tmax(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64, rec: &mut HitRecord) -> bool {
         let mut hit_anything = false;
-        let mut closest_so_far = t_max;
+        let mut closest_so_far = ray_tmax;
         let mut temp_rec = HitRecord {
             p: Point3::new(0.0, 0.0, 0.0),
             normal: Vec3::new(0.0, 0.0, 0.0),
@@ -58,13 +59,32 @@ impl Hittable for HittableList {
         };
 
         for object in &self.objects {
-            if object.hit(r, t_min, closest_so_far, &mut temp_rec) {
+            if object.hit_tmin_tmax(r, ray_tmin, closest_so_far, &mut temp_rec) {
                 hit_anything = true;
                 closest_so_far = temp_rec.t;
                 *rec = temp_rec;
             }
         }
 
-        hit_anything
+        return hit_anything;
+    }
+    fn hit_interval(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
+        let mut hit_anything = false;
+        let mut closest_so_far = ray_t.max;
+        let mut temp_rec = HitRecord {
+            p: Point3::new(0.0, 0.0, 0.0),
+            normal: Vec3::new(0.0, 0.0, 0.0),
+            t: 0.0,
+            front_face: false,
+        };
+
+        for object in &self.objects {
+            if object.hit_interval(r, Interval::new(ray_t.min, closest_so_far), &mut temp_rec) {
+                hit_anything = true;
+                closest_so_far = temp_rec.t;
+                *rec = temp_rec;
+            }
+        }
+        return hit_anything;
     }
 }
