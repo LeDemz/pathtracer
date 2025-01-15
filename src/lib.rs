@@ -1,3 +1,4 @@
+mod camera;
 mod color;
 mod constants;
 mod hittable;
@@ -5,8 +6,8 @@ mod interval;
 mod ray;
 mod sphere;
 mod vec3;
-mod camera;
 
+pub use camera::Camera;
 pub use color::write_color;
 pub use color::Color;
 pub use constants::{degrees_to_radians, INFINITY, PI};
@@ -15,4 +16,3 @@ pub use interval::Interval;
 pub use ray::Ray;
 pub use sphere::Sphere;
 pub use vec3::{dot, unit_vector, Point3, Vec3};
-pub use camera::Camera;
