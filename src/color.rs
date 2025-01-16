@@ -1,4 +1,4 @@
-use crate::Vec3;
+use crate::{Interval, Vec3};
 use std::fs::File;
 use std::io::Write;
 
@@ -9,9 +9,11 @@ pub fn write_color(mut file_handle: &File, pixel_color: &Color) {
     let g = pixel_color.y();
     let b = pixel_color.z();
 
-    let rbyte: i32 = (255.99 * r).floor() as i32;
-    let gbyte: i32 = (255.99 * g).floor() as i32;
-    let bbyte: i32 = (255.99 * b).floor() as i32;
+    // Translate the [0,1] component values to the byte range [0,255]
+    let intensity = Interval::new(0.000,0.999);
+    let rbyte: i32 = (256.0 * intensity.clamp(r)) as i32;
+    let gbyte: i32 = (256.0 * intensity.clamp(g)) as i32;
+    let bbyte: i32 = (256.0 * intensity.clamp(b)) as i32;
 
     writeln!(file_handle, "{} {} {}", rbyte, gbyte, bbyte)
         .expect("Unable to write content to file");

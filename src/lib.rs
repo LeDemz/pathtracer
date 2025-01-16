@@ -5,6 +5,7 @@ mod hittable;
 mod interval;
 mod ray;
 mod sphere;
+mod utility;
 mod vec3;
 
 pub use camera::Camera;
@@ -15,4 +16,5 @@ pub use hittable::{HitRecord, Hittable, HittableList};
 pub use interval::Interval;
 pub use ray::Ray;
 pub use sphere::Sphere;
+pub use utility::{random_double, random_double_range};
 pub use vec3::{dot, unit_vector, Point3, Vec3};
