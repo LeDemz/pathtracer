@@ -12,6 +12,7 @@ pub struct Camera {
     pub aspect_ratio: f64,      // Ratio of image width over height
     pub image_width: u32,       // Rendered image width in pixel count
     pub samples_per_pixel: u32, // Count of random samples for each pixel
+    pub max_depth: u32,         // Maximum number of ray bounces into scene
     image_height: u32,          // Rendered image height
     center: Point3,             // Camera center
     pixel00_loc: Point3,        // Location of pixel 0, 0
@@ -26,6 +27,7 @@ impl Camera {
             aspect_ratio: 1.0,
             image_width: 100,
             image_height: 100,
+            max_depth: 10,
             center: Point3::new(0.0, 0.0, 0.0),
             pixel00_loc: Point3::new(0.0, 0.0, 0.0),
             pixel_delta_u: Vec3::new(0.0, 0.0, 0.0),
@@ -64,7 +66,7 @@ impl Camera {
                 let mut pixel_color = Color::new(0.0, 0.0, 0.0);
                 for sample in (0..self.samples_per_pixel) {
                     let r = Self::get_ray(self, i, j);
-                    pixel_color += Self::ray_color(self, &r, world);
+                    pixel_color += Self::ray_color(self, &r, self.max_depth, world);
                 }
                 write_color(&file, &(self.pixel_samples_scale * pixel_color));
             }
@@ -103,12 +105,16 @@ impl Camera {
         self.pixel00_loc = viewport_upper_left + 0.5 * (self.pixel_delta_u + self.pixel_delta_v);
     }
 
-    fn ray_color(&self, r: &Ray, world: &dyn Hittable) -> Color {
+    fn ray_color(&self, r: &Ray, depth: u32, world: &dyn Hittable) -> Color {
+        if depth <= 0 {
+            return Color::new(0.0, 0.0, 0.0);
+        }
+
         let mut rec = HitRecord::new();
 
-        if world.hit_interval(r, Interval::new(0.0, INFINITY), &mut rec) {
+        if world.hit_interval(r, Interval::new(0.001, INFINITY), &mut rec) {
             let direction = random_on_hemisphere(&rec.normal);
-            return 0.5 * self.ray_color(&Ray::new(rec.p, direction), world);
+            return 0.5 * self.ray_color(&Ray::new(rec.p, direction), depth - 1, world);
         }
 
         let unit_direction = unit_vector(r.direction());
