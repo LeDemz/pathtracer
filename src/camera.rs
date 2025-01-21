@@ -4,20 +4,20 @@ use std::io::Write;
 use indicatif::{ProgressBar, ProgressStyle};
 
 use crate::{
-    random_double, ray, unit_vector, write_color, Color, HitRecord, Hittable, Interval, Point3, Ray, Vec3, INFINITY
+    random_double, ray, unit_vector, vec3::random_on_hemisphere, write_color, Color, HitRecord,
+    Hittable, Interval, Point3, Ray, Vec3, INFINITY,
 };
 
 pub struct Camera {
-    pub aspect_ratio: f64, // Ratio of image width over height
-    pub image_width: u32, // Rendered image width in pixel count
+    pub aspect_ratio: f64,      // Ratio of image width over height
+    pub image_width: u32,       // Rendered image width in pixel count
     pub samples_per_pixel: u32, // Count of random samples for each pixel
-    image_height: u32, // Rendered image height
-    center: Point3, // Camera center
-    pixel00_loc: Point3, // Location of pixel 0, 0
-    pixel_delta_u: Vec3, // Offset to pixel to the right
-    pixel_delta_v: Vec3, // Offset to pixel below
-    pixel_samples_scale: f64, // Color scale factor for a sum of pixel samples
-
+    image_height: u32,          // Rendered image height
+    center: Point3,             // Camera center
+    pixel00_loc: Point3,        // Location of pixel 0, 0
+    pixel_delta_u: Vec3,        // Offset to pixel to the right
+    pixel_delta_v: Vec3,        // Offset to pixel below
+    pixel_samples_scale: f64,   // Color scale factor for a sum of pixel samples
 }
 
 impl Camera {
@@ -62,8 +62,8 @@ impl Camera {
             pb.inc(1);
             for i in (0..self.image_width) {
                 let mut pixel_color = Color::new(0.0, 0.0, 0.0);
-                for sample in (0..self.samples_per_pixel){
-                    let r = Self::get_ray(self, i,j);
+                for sample in (0..self.samples_per_pixel) {
+                    let r = Self::get_ray(self, i, j);
                     pixel_color += Self::ray_color(self, &r, world);
                 }
                 write_color(&file, &(self.pixel_samples_scale * pixel_color));
@@ -107,7 +107,8 @@ impl Camera {
         let mut rec = HitRecord::new();
 
         if world.hit_interval(r, Interval::new(0.0, INFINITY), &mut rec) {
-            return 0.5 * (rec.normal + Color::new(1.0, 1.0, 1.0));
+            let direction = random_on_hemisphere(&rec.normal);
+            return 0.5 * self.ray_color(&Ray::new(rec.p, direction), world);
         }
 
         let unit_direction = unit_vector(r.direction());
@@ -116,12 +117,14 @@ impl Camera {
         return (1.0 - a) * Color::new(1.0, 1.0, 1.0) + a * Color::new(0.5, 0.7, 1.0);
     }
 
-    fn get_ray(&self, i : u32, j : u32) -> Ray {
-        // Construct a camera ray originating from the origin and directed at randomly sampled 
+    fn get_ray(&self, i: u32, j: u32) -> Ray {
+        // Construct a camera ray originating from the origin and directed at randomly sampled
         // point around the pixel location i,j
 
         let offset = Self::sample_square();
-        let pixel_sample = self.pixel00_loc + ((i as f64 + offset.x()) * self.pixel_delta_u) + ((j as f64 + offset.y()) * self.pixel_delta_v);
+        let pixel_sample = self.pixel00_loc
+            + ((i as f64 + offset.x()) * self.pixel_delta_u)
+            + ((j as f64 + offset.y()) * self.pixel_delta_v);
         let ray_origin = self.center;
         let ray_direction = pixel_sample - ray_origin;
 
@@ -129,6 +132,6 @@ impl Camera {
     }
 
     fn sample_square() -> Vec3 {
-        return Vec3::new(random_double()-0.5, random_double()-0.5, 0.0);
+        return Vec3::new(random_double() - 0.5, random_double() - 0.5, 0.0);
     }
 }

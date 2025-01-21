@@ -10,7 +10,7 @@ pub fn write_color(mut file_handle: &File, pixel_color: &Color) {
     let b = pixel_color.z();
 
     // Translate the [0,1] component values to the byte range [0,255]
-    let intensity = Interval::new(0.000,0.999);
+    let intensity = Interval::new(0.000, 0.999);
     let rbyte: i32 = (256.0 * intensity.clamp(r)) as i32;
     let gbyte: i32 = (256.0 * intensity.clamp(g)) as i32;
     let bbyte: i32 = (256.0 * intensity.clamp(b)) as i32;
