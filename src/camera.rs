@@ -4,7 +4,7 @@ use std::io::Write;
 use indicatif::{ProgressBar, ProgressStyle};
 
 use crate::{
-    random_double, ray, unit_vector, vec3::random_on_hemisphere, write_color, Color, HitRecord,
+    random_double, ray, unit_vector, vec3::{random_on_hemisphere, random_unit_vector}, write_color, Color, HitRecord,
     Hittable, Interval, Point3, Ray, Vec3, INFINITY,
 };
 
@@ -113,7 +113,7 @@ impl Camera {
         let mut rec = HitRecord::new();
 
         if world.hit_interval(r, Interval::new(0.001, INFINITY), &mut rec) {
-            let direction = random_on_hemisphere(&rec.normal);
+            let direction = rec.normal + random_unit_vector();
             return 0.5 * self.ray_color(&Ray::new(rec.p, direction), depth - 1, world);
         }
 
