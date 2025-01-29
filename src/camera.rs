@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::Write;
 
+use image::ImageFormat;
 use indicatif::{ProgressBar, ProgressStyle};
 
 use crate::{
@@ -72,6 +73,10 @@ impl Camera {
                 write_color(&file, &(self.pixel_samples_scale * pixel_color));
             }
         }
+        let img = image::open("image.ppm").expect("Unable to write image to file");
+
+        // Save it as a JPEG
+        img.save_with_format("output.jpg", ImageFormat::Jpeg).expect("Unable to write image to file");
         pb.finish_with_message("Done");
     }
 
