@@ -1,4 +1,4 @@
-use crate::{vec3::random_unit_vector, Color, HitRecord, Ray};
+use crate::{dot, reflect, vec3::random_unit_vector, Color, HitRecord, Ray};
 
 pub trait Material {
     fn scatter(
@@ -47,6 +47,12 @@ pub struct Metal {
     albedo: Color,
 }
 
+impl Metal {
+    pub fn new(a: Color) -> Self {
+        Self { albedo: a }
+    }
+}
+
 impl Material for Metal {
     fn scatter(
         &self,
@@ -55,9 +61,31 @@ impl Material for Metal {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
-        let reflected = reflect(r_in.direction(), rec.normal);
+        let reflected = reflect(&r_in.direction(), &rec.normal);
         *scattered = Ray::new(rec.p, reflected);
         *attenuation = self.albedo;
         return dot(scattered.direction(), rec.normal) > 0.0;
+    }
+}
+
+pub struct DefaultMaterial {
+    albedo: Color,
+}
+impl Material for DefaultMaterial {
+    fn scatter(
+        &self,
+        _r: &Ray,
+        _rec: &HitRecord,
+        _attenuation: &mut Color,
+        _scattered: &mut Ray,
+    ) -> bool {
+        return false;
+    }
+}
+impl DefaultMaterial {
+    pub fn new() -> Self {
+        Self {
+            albedo: Color::new(0.0, 0.0, 0.0),
+        }
     }
 }

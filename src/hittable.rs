@@ -1,7 +1,8 @@
+use crate::DefaultMaterial;
 use crate::{dot, interval::Interval, Material, Point3, Ray, Vec3};
 use std::rc::Rc;
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
@@ -14,8 +15,8 @@ impl HitRecord {
     pub fn new() -> Self {
         HitRecord {
             p: Point3::new(0.0, 0.0, 0.0),
+            mat: Rc::new(DefaultMaterial::new()),
             normal: Vec3::new(0.0, 0.0, 0.0),
-            mat: Rc::new(Material::default()),
             t: 0.0,
             front_face: false,
         }
@@ -67,13 +68,14 @@ impl Hittable for HittableList {
             normal: Vec3::new(0.0, 0.0, 0.0),
             t: 0.0,
             front_face: false,
+            mat: Rc::new(DefaultMaterial::new()),
         };
 
         for object in &self.objects {
             if object.hit_tmin_tmax(r, ray_tmin, closest_so_far, &mut temp_rec) {
                 hit_anything = true;
                 closest_so_far = temp_rec.t;
-                *rec = temp_rec;
+                *rec = temp_rec.clone();
             }
         }
 
@@ -87,13 +89,14 @@ impl Hittable for HittableList {
             normal: Vec3::new(0.0, 0.0, 0.0),
             t: 0.0,
             front_face: false,
+            mat: Rc::new(DefaultMaterial::new()),
         };
 
         for object in &self.objects {
             if object.hit_interval(r, Interval::new(ray_t.min, closest_so_far), &mut temp_rec) {
                 hit_anything = true;
                 closest_so_far = temp_rec.t;
-                *rec = temp_rec;
+                *rec = temp_rec.clone();
             }
         }
         return hit_anything;
