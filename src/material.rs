@@ -1,6 +1,5 @@
 use crate::{
-    vec3::{random_unit_vector, reflect},
-    Color, HitRecord, Ray,
+    dot, unit_vector, vec3::{random_unit_vector, reflect}, Color, HitRecord, Ray
 };
 
 pub trait Material {
@@ -67,11 +66,13 @@ impl Material for Lambertian {
 
 pub struct Metal {
     albedo: Color,
+    fuzz : f64,
 }
 
 impl Metal {
-    pub fn new(albedo: Color) -> Self {
-        Metal { albedo }
+    pub fn new(albedo: Color, fuzz : f64) -> Self {
+        let mod_fuzz = if fuzz < 1.0 { fuzz } else { 1.0 };
+        Metal { albedo, fuzz : mod_fuzz }
     }
 }
 
@@ -83,9 +84,10 @@ impl Material for Metal {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
-        let reflected = reflect(r_in.direction(), rec.normal);
+        let mut reflected = reflect(r_in.direction(), rec.normal);
+        reflected = unit_vector(reflected) + (self.fuzz * random_unit_vector());
         *scattered = Ray::new(rec.p, reflected);
         *attenuation = self.albedo;
-        return true;
+        return dot(scattered.direction(), rec.normal) > 0.0;
     }
 }
