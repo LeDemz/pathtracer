@@ -1,4 +1,4 @@
-use crate::{dot, DefaultMaterial, HitRecord, Hittable, Interval, Material, Point3, Ray};
+use crate::{dot, HitRecord, Hittable, Interval, Material, Point3, Ray};
 use std::rc::Rc;
 pub struct Sphere {
     center: Point3,

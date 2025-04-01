@@ -5,8 +5,7 @@ use image::ImageFormat;
 use indicatif::{ProgressBar, ProgressStyle};
 
 use crate::{
-    random_double, ray, unit_vector,
-    vec3::{random_on_hemisphere, random_unit_vector},
+    random_double, unit_vector,
     write_color, Color, HitRecord, Hittable, Interval, Point3, Ray, Vec3, INFINITY,
 };
 
@@ -62,11 +61,11 @@ impl Camera {
         writeln!(file, "P3\n{} {}\n255", self.image_width, self.image_height)
             .expect("Unable to write header to file");
 
-        for j in (0..self.image_height) {
+        for j in 0..self.image_height {
             pb.inc(1);
-            for i in (0..self.image_width) {
+            for i in 0..self.image_width {
                 let mut pixel_color = Color::new(0.0, 0.0, 0.0);
-                for sample in (0..self.samples_per_pixel) {
+                for _sample in 0..self.samples_per_pixel {
                     let r = Self::get_ray(self, i, j);
                     pixel_color += Self::ray_color(self, &r, self.max_depth, world);
                 }

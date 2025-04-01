@@ -41,12 +41,3 @@ impl Interval {
         return x;
     }
 }
-
-const INTERVAL_EMPTY: Interval = Interval {
-    min: INFINITY,
-    max: -INFINITY,
-};
-const INTERVAL_UNIVERSE: Interval = Interval {
-    min: -INFINITY,
-    max: INFINITY,
-};

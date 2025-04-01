@@ -1,0 +1,2 @@
+[alias]
+build = "fmt && build"
