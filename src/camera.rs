@@ -5,9 +5,8 @@ use image::ImageFormat;
 use indicatif::{ProgressBar, ProgressStyle};
 
 use crate::{
-    random_double, ray, unit_vector,
-    vec3::{random_on_hemisphere, random_unit_vector},
-    write_color, Color, HitRecord, Hittable, Interval, Point3, Ray, Vec3, INFINITY,
+    random_double, ray, unit_vector, vec3::{random_on_hemisphere, random_unit_vector}, write_color, Color, HitRecord,
+    Hittable, Interval, Point3, Ray, Vec3, INFINITY,
 };
 
 pub struct Camera {

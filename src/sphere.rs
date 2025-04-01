@@ -1,10 +1,7 @@
-use std::rc::Rc;
-
-use crate::{dot, HitRecord, Hittable, Interval, Material, Point3, Ray};
+use crate::{dot, HitRecord, Hittable, Interval, Point3, Ray};
 pub struct Sphere {
     center: Point3,
     radius: f64,
-    mat: Rc<dyn Material>,
 }
 
 impl Sphere {
@@ -41,7 +38,6 @@ impl Hittable for Sphere {
         rec.p = r.at(rec.t);
         let outward_normal = (rec.p - self.center) / self.radius;
         rec.set_face_normal(r, &outward_normal);
-        rec.mat = mat;
 
         return true;
     }
