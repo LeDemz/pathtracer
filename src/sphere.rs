@@ -1,17 +1,17 @@
-use crate::{dot, HitRecord, Hittable, Interval, DefaultMaterial, Material, Point3, Ray};
+use crate::{dot, DefaultMaterial, HitRecord, Hittable, Interval, Material, Point3, Ray};
 use std::rc::Rc;
 pub struct Sphere {
     center: Point3,
     radius: f64,
-    mat : Rc<dyn Material>,
+    mat: Rc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64, mat : Rc<dyn Material>) -> Self {
+    pub fn new(center: Point3, radius: f64, mat: Rc<dyn Material>) -> Self {
         Self {
             center,
             radius: f64::max(0.0, radius),
-            mat
+            mat,
         }
     }
 }

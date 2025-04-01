@@ -5,7 +5,7 @@ use std::rc::Rc;
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
-    pub mat : Rc<dyn Material>,
+    pub mat: Rc<dyn Material>,
     pub t: f64,
     pub front_face: bool,
 }
@@ -16,7 +16,7 @@ impl HitRecord {
             p: Point3::new(0.0, 0.0, 0.0),
             normal: Vec3::new(0.0, 0.0, 0.0),
             t: 0.0,
-            mat : Rc::new(DefaultMaterial::new()),
+            mat: Rc::new(DefaultMaterial::new()),
             front_face: false,
         }
     }

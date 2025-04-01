@@ -5,8 +5,9 @@ use image::ImageFormat;
 use indicatif::{ProgressBar, ProgressStyle};
 
 use crate::{
-    random_double, ray, unit_vector, vec3::{random_on_hemisphere, random_unit_vector}, write_color, Color, HitRecord,
-    Hittable, Interval, Point3, Ray, Vec3, INFINITY,
+    random_double, ray, unit_vector,
+    vec3::{random_on_hemisphere, random_unit_vector},
+    write_color, Color, HitRecord, Hittable, Interval, Point3, Ray, Vec3, INFINITY,
 };
 
 pub struct Camera {
@@ -75,7 +76,8 @@ impl Camera {
         let img = image::open("image.ppm").expect("Unable to write image to file");
 
         // Save it as a JPEG
-        img.save_with_format("output.jpg", ImageFormat::Jpeg).expect("Unable to write image to file");
+        img.save_with_format("output.jpg", ImageFormat::Jpeg)
+            .expect("Unable to write image to file");
         pb.finish_with_message("Done");
     }
 
