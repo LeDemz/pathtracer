@@ -23,6 +23,11 @@ impl Vec3 {
         self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2]
     }
 
+    pub fn near_zero (&self) -> bool {
+        const EPSILON: f64 = 1e-8;
+        self.e[0].abs() < EPSILON && self.e[1].abs() < EPSILON && self.e[2].abs() < EPSILON
+    }
+
     pub fn x(&self) -> f64 {
         self.e[0]
     }
@@ -199,6 +204,10 @@ pub fn random_on_hemisphere(normal: &Vec3) -> Vec3 {
     } else {
         return -on_unit_sphere;
     }
+}
+
+pub fn reflect(v : Vec3, n : Vec3) -> Vec3 {
+    v - 2.0 * dot(v, n) * n
 }
 
 // Unit tests for Vec3

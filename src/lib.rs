@@ -7,6 +7,7 @@ mod ray;
 mod sphere;
 mod utility;
 mod vec3;
+mod material;
 
 pub use camera::Camera;
 pub use color::write_color;
@@ -18,3 +19,4 @@ pub use ray::Ray;
 pub use sphere::Sphere;
 pub use utility::{random_double, random_double_range};
 pub use vec3::{dot, unit_vector, Point3, Vec3};
+pub use material::{DefaultMaterial, Material, Metal, Lambertian};

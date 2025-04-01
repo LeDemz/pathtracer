@@ -1,10 +1,11 @@
-use crate::{dot, interval::Interval, Point3, Ray, Vec3};
+use crate::{dot, interval::Interval, DefaultMaterial, Material, Point3, Ray, Vec3};
 use std::rc::Rc;
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
+    pub mat : Rc<dyn Material>,
     pub t: f64,
     pub front_face: bool,
 }
@@ -15,6 +16,7 @@ impl HitRecord {
             p: Point3::new(0.0, 0.0, 0.0),
             normal: Vec3::new(0.0, 0.0, 0.0),
             t: 0.0,
+            mat : Rc::new(DefaultMaterial::new()),
             front_face: false,
         }
     }
@@ -63,6 +65,7 @@ impl Hittable for HittableList {
         let mut temp_rec = HitRecord {
             p: Point3::new(0.0, 0.0, 0.0),
             normal: Vec3::new(0.0, 0.0, 0.0),
+            mat: Rc::new(DefaultMaterial::new()),
             t: 0.0,
             front_face: false,
         };
@@ -71,7 +74,7 @@ impl Hittable for HittableList {
             if object.hit_tmin_tmax(r, ray_tmin, closest_so_far, &mut temp_rec) {
                 hit_anything = true;
                 closest_so_far = temp_rec.t;
-                *rec = temp_rec;
+                *rec = temp_rec.clone();
             }
         }
 
@@ -83,6 +86,7 @@ impl Hittable for HittableList {
         let mut temp_rec = HitRecord {
             p: Point3::new(0.0, 0.0, 0.0),
             normal: Vec3::new(0.0, 0.0, 0.0),
+            mat: Rc::new(DefaultMaterial::new()),
             t: 0.0,
             front_face: false,
         };
@@ -91,7 +95,7 @@ impl Hittable for HittableList {
             if object.hit_interval(r, Interval::new(ray_t.min, closest_so_far), &mut temp_rec) {
                 hit_anything = true;
                 closest_so_far = temp_rec.t;
-                *rec = temp_rec;
+                *rec = temp_rec.clone();
             }
         }
         return hit_anything;
