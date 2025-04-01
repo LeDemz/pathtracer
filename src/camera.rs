@@ -62,11 +62,11 @@ impl Camera {
         writeln!(file, "P3\n{} {}\n255", self.image_width, self.image_height)
             .expect("Unable to write header to file");
 
-        for j in 0..self.image_height {
+        for j in (0..self.image_height) {
             pb.inc(1);
-            for i in 0..self.image_width {
+            for i in (0..self.image_width) {
                 let mut pixel_color = Color::new(0.0, 0.0, 0.0);
-                for sample in 0..self.samples_per_pixel {
+                for sample in (0..self.samples_per_pixel) {
                     let r = Self::get_ray(self, i, j);
                     pixel_color += Self::ray_color(self, &r, self.max_depth, world);
                 }
@@ -76,8 +76,7 @@ impl Camera {
         let img = image::open("image.ppm").expect("Unable to write image to file");
 
         // Save it as a JPEG
-        img.save_with_format("output.jpg", ImageFormat::Jpeg)
-            .expect("Unable to write image to file");
+        img.save_with_format("output.jpg", ImageFormat::Jpeg).expect("Unable to write image to file");
         pb.finish_with_message("Done");
     }
 
@@ -120,12 +119,8 @@ impl Camera {
         let mut rec = HitRecord::new();
 
         if world.hit_interval(r, Interval::new(0.001, INFINITY), &mut rec) {
-            let mut scattered = Ray::default();
-            let mut attenuation = Color::default();
-            if (rec.mat.scatter(r, &rec, &mut attenuation, &mut scattered)) {
-                return attenuation * self.ray_color(&mut scattered, depth - 1, world);
-            }
-            return Color::new(0.0, 0.0, 0.0);
+            let direction = rec.normal + random_unit_vector();
+            return 0.5 * self.ray_color(&Ray::new(rec.p, direction), depth - 1, world);
         }
 
         let unit_direction = unit_vector(r.direction());
