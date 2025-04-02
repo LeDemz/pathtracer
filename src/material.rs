@@ -1,5 +1,7 @@
 use crate::{
-    dot, unit_vector, vec3::{random_unit_vector, reflect, refract}, Color, HitRecord, Ray
+    dot, unit_vector,
+    vec3::{random_unit_vector, reflect, refract},
+    Color, HitRecord, Ray, Vec3,
 };
 
 pub trait Material {
@@ -66,13 +68,16 @@ impl Material for Lambertian {
 
 pub struct Metal {
     albedo: Color,
-    fuzz : f64,
+    fuzz: f64,
 }
 
 impl Metal {
-    pub fn new(albedo: Color, fuzz : f64) -> Self {
+    pub fn new(albedo: Color, fuzz: f64) -> Self {
         let mod_fuzz = if fuzz < 1.0 { fuzz } else { 1.0 };
-        Metal { albedo, fuzz : mod_fuzz }
+        Metal {
+            albedo,
+            fuzz: mod_fuzz,
+        }
     }
 }
 
@@ -109,12 +114,25 @@ impl Material for Dielectric {
         scattered: &mut Ray,
     ) -> bool {
         *attenuation = Color::new(1.0, 1.0, 1.0);
-        let ri = if rec.front_face { 1.0 / self.refraction_index } else { self.refraction_index };
+        let ri: f64 = if rec.front_face {
+            1.0 / self.refraction_index
+        } else {
+            self.refraction_index
+        };
+        let cos_theta = f64::min(dot(-unit_vector(r_in.direction()), rec.normal), 1.0);
+        let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
+        let cannot_refract: bool = ri * sin_theta > 1.0;
 
+        let direction: Vec3;
         let unit_direction = unit_vector(r_in.direction());
-        let refracted = refract(unit_direction, rec.normal, ri);
 
-        *scattered = Ray::new(rec.p, refracted);
+        if cannot_refract {
+            direction = reflect(unit_direction, rec.normal);
+        } else {
+            direction = refract(unit_direction, rec.normal, self.refraction_index);
+        }
+
+        *scattered = Ray::new(rec.p, direction);
         return true;
     }
 }
