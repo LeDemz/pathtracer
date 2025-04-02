@@ -1,5 +1,5 @@
 use crate::{
-    dot, unit_vector,
+    dot, random_double, unit_vector,
     vec3::{random_unit_vector, reflect, refract},
     Color, HitRecord, Ray, Vec3,
 };
@@ -104,7 +104,14 @@ impl Dielectric {
     pub fn new(refraction_index: f64) -> Self {
         Dielectric { refraction_index }
     }
+    fn reflectance(&self, cosine: f64, refraction_index: f64) -> f64 {
+        // Use Schlick's approximation for reflectance.
+        let r0 = (1.0 - refraction_index) / (1.0 + refraction_index);
+        let r0 = r0 * r0;
+        return r0 + (1.0 - r0) * ((1.0 - cosine).powi(5));
+    }
 }
+
 impl Material for Dielectric {
     fn scatter(
         &self,
@@ -126,10 +133,10 @@ impl Material for Dielectric {
         let direction: Vec3;
         let unit_direction = unit_vector(r_in.direction());
 
-        if cannot_refract {
+        if cannot_refract || self.reflectance(cos_theta, ri) > random_double() {
             direction = reflect(unit_direction, rec.normal);
         } else {
-            direction = refract(unit_direction, rec.normal, self.refraction_index);
+            direction = refract(unit_direction, rec.normal, ri);
         }
 
         *scattered = Ray::new(rec.p, direction);
