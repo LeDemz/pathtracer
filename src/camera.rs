@@ -5,8 +5,8 @@ use image::ImageFormat;
 use indicatif::{ProgressBar, ProgressStyle};
 
 use crate::{
-    random_double, unit_vector, write_color, Color, HitRecord, Hittable, Interval, Point3, Ray,
-    Vec3, INFINITY,
+    degrees_to_radians, random_double, unit_vector, write_color, Color, HitRecord, Hittable,
+    Interval, Point3, Ray, Vec3, INFINITY,
 };
 
 pub struct Camera {
@@ -14,6 +14,7 @@ pub struct Camera {
     pub image_width: u32,       // Rendered image width in pixel count
     pub samples_per_pixel: u32, // Count of random samples for each pixel
     pub max_depth: u32,         // Maximum number of ray bounces into scene
+    pub fvov: f64,              // Vertical view angle (field of view)
     image_height: u32,          // Rendered image height
     center: Point3,             // Camera center
     pixel00_loc: Point3,        // Location of pixel 0, 0
@@ -35,6 +36,7 @@ impl Camera {
             pixel_delta_v: Vec3::new(0.0, 0.0, 0.0),
             samples_per_pixel: 1,
             pixel_samples_scale: 1.0,
+            fvov: 90.0,
         }
     }
 
@@ -93,7 +95,9 @@ impl Camera {
 
         // Determine the viewport dimensions.
         let focal_length: f64 = 1.0;
-        let viewport_height: f64 = 2.0;
+        let theta = degrees_to_radians(self.fvov);
+        let h = f64::tan(theta / 2.0);
+        let viewport_height = 2.0 * h * focal_length;
         let viewport_width: f64 =
             viewport_height * (self.image_width as f64) / (self.image_height as f64);
 
